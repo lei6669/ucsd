@@ -213,7 +213,7 @@ Index * build_index(RawData * data) {
 	auto reconstruct_start = std::chrono::high_resolution_clock::now();
 	// multi-thread for building index on each raw data spectrum
 	int size = data->size();
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for(SID sid = 0; sid < size; sid++) {
 		unsigned int unit_frag;
 		Spectrum spectrum = (*data)[sid];
@@ -228,23 +228,23 @@ Index * build_index(RawData * data) {
 				int currentSize = (*index)[unit_frag].size();
 				if (currentSize == 0 || (*index)[unit_frag][currentSize-1].first < sid) {
 					// std::cout<<"aa"<<std::endl;
-					omp_set_lock(&index_lock[unit_frag]);
+					//omp_set_lock(&index_lock[unit_frag]);
 					(*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
-					omp_unset_lock(&index_lock[unit_frag]);
+					//omp_unset_lock(&index_lock[unit_frag]);
 				} else {  // now need to push the element into the front of equal sid
 					// std::cout<<"ss"<<std::endl;
 					if ((*index)[unit_frag][currentSize-1].second.second <= peak.second) {
-						omp_set_lock(&index_lock[unit_frag]);
+						//omp_set_lock(&index_lock[unit_frag]);
 						(*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
-						omp_unset_lock(&index_lock[unit_frag]);
+						//omp_unset_lock(&index_lock[unit_frag]);
 					} else {
 						int insertIndex = currentSize-1;
 						while (insertIndex-1>=0 && (*index)[unit_frag][insertIndex-1].first == sid && (*index)[unit_frag][insertIndex-1].second.second>peak.second) {
 							insertIndex -= 1;
 						}
-						omp_set_lock(&index_lock[unit_frag]);
+						//omp_set_lock(&index_lock[unit_frag]);
 						(*index)[unit_frag].insert((*index)[unit_frag].begin()+insertIndex, BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
-						omp_unset_lock(&index_lock[unit_frag]);
+						//omp_unset_lock(&index_lock[unit_frag]);
 					}
 				}
 				// omp_unset_lock(&index_lock[unit_frag]);
