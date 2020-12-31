@@ -287,7 +287,7 @@ std::vector<std::map<SID, Spectrum>> *reconstruct_candidates(Index * index, cons
 	omp_lock_t map_lock;
 	omp_init_lock(&map_lock);
 	auto reconstructed_spectra = new std::vector<std::map<SID, Spectrum>>;
-	std::map<int, std::map<SID, Spectrum>> temp;
+	std::map<int, std::map<SID, Spectrum> > temp;
 	int size = queries.size();
 	#pragma omp parallel for
 	for(int i=0; i<size; i++) {
@@ -305,7 +305,7 @@ std::vector<std::map<SID, Spectrum>> *reconstruct_candidates(Index * index, cons
 			}
 		}
 		omp_set_lock(&map_lock);
-		temp[i] = m;
+		temp.insert({i, m});
 		omp_unset_lock(&map_lock);
 	}
 	for (int i=0; i<size; i++) {
