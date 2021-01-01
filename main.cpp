@@ -222,32 +222,32 @@ Index * build_index(RawData * data) {
 			Peak peak = spectrum[i];
 			unit_frag = peak.first/num_buckets;
 			if (unit_frag < MAX_MZ) {
-				// (*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
-				// (*index)[unit_frag].push_back(BucketPeak(sid, peak.second));
-				// omp_set_lock(&index_lock[unit_frag]);
-				int currentSize = (*index)[unit_frag].size();
-				if (currentSize == 0 || (*index)[unit_frag][currentSize-1].first < sid) {
-					// std::cout<<"aa"<<std::endl;
-					//omp_set_lock(&index_lock[unit_frag]);
-					(*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
-					//omp_unset_lock(&index_lock[unit_frag]);
-				} else {  // now need to push the element into the front of equal sid
-					// std::cout<<"ss"<<std::endl;
-					if ((*index)[unit_frag][currentSize-1].second.second <= peak.second) {
-						//omp_set_lock(&index_lock[unit_frag]);
-						(*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
-						//omp_unset_lock(&index_lock[unit_frag]);
-					} else {
-						int insertIndex = currentSize-1;
-						while (insertIndex-1>=0 && (*index)[unit_frag][insertIndex-1].first == sid && (*index)[unit_frag][insertIndex-1].second.second>peak.second) {
-							insertIndex -= 1;
-						}
-						//omp_set_lock(&index_lock[unit_frag]);
-						(*index)[unit_frag].insert((*index)[unit_frag].begin()+insertIndex, BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
-						//omp_unset_lock(&index_lock[unit_frag]);
-					}
-				}
-				// omp_unset_lock(&index_lock[unit_frag]);
+				(*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
+				// // (*index)[unit_frag].push_back(BucketPeak(sid, peak.second));
+				// // omp_set_lock(&index_lock[unit_frag]);
+				// int currentSize = (*index)[unit_frag].size();
+				// if (currentSize == 0 || (*index)[unit_frag][currentSize-1].first < sid) {
+				// 	// std::cout<<"aa"<<std::endl;
+				// 	//omp_set_lock(&index_lock[unit_frag]);
+				// 	(*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
+				// 	//omp_unset_lock(&index_lock[unit_frag]);
+				// } else {  // now need to push the element into the front of equal sid
+				// 	// std::cout<<"ss"<<std::endl;
+				// 	if ((*index)[unit_frag][currentSize-1].second.second <= peak.second) {
+				// 		//omp_set_lock(&index_lock[unit_frag]);
+				// 		(*index)[unit_frag].push_back(BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
+				// 		//omp_unset_lock(&index_lock[unit_frag]);
+				// 	} else {
+				// 		int insertIndex = currentSize-1;
+				// 		while (insertIndex-1>=0 && (*index)[unit_frag][insertIndex-1].first == sid && (*index)[unit_frag][insertIndex-1].second.second>peak.second) {
+				// 			insertIndex -= 1;
+				// 		}
+				// 		//omp_set_lock(&index_lock[unit_frag]);
+				// 		(*index)[unit_frag].insert((*index)[unit_frag].begin()+insertIndex, BucketPeak(sid, std::pair<MZ, Intensity>(peak.first, peak.second)));
+				// 		//omp_unset_lock(&index_lock[unit_frag]);
+				// 	}
+				// }
+				// // omp_unset_lock(&index_lock[unit_frag]);
 			}
 		}
 	}
@@ -255,9 +255,9 @@ Index * build_index(RawData * data) {
 	auto reconstruct_end = std::chrono::high_resolution_clock::now();
 	// multi-thread on sroting part
 	// #pragma omp parallel for
-	// for(MZ mz = 0; mz < MAX_MZ; mz++) {
-	// 	std::sort((*index)[mz].begin(), (*index)[mz].end());
-	// }
+	for(MZ mz = 0; mz < MAX_MZ; mz++) {
+		std::sort((*index)[mz].begin(), (*index)[mz].end());
+	}
 
 	// int who = 999;
 	// int compare[(*index)[who].size()];
